@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>きらりへ💌</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        #content {
+            display: none;
+        }
+
+        input {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        p {
+            font-size: 20px;
+            color: #333333;
+        }
+    </style>
+
+    <script>
+        function checkPassword() {
+            const password = document.getElementById("password").value;
+            const correctPassword = "5555"; // ←ここを変更
+
+            if (password === correctPassword) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("content").style.display = "block";
+            } else {
+                alert("パスワードが違います🥲");
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <div id="login">
+        <h2>パスワードを入力してね 💌</h2>
+        <input type="password" id="password" placeholder="パスワード">
+        <button onclick="checkPassword()">開く</button>
+    </div>
+
+    <div id="content">
+        <h1>きらりへ💌</h1>
+
+        <p>
+            字がきれいじゃないからテキストでのお手紙～<br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            ずっと下へいってね<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <strong>だいすきだよ、きらりのこと</strong>
+        </p>
+    </div>
+
+</body>
+</html>
