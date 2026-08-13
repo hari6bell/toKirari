@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>きらりへ💌</title>
+  </head>
+  <body>
+    <!-- ログイン画面 -->
+    <div id="login-page">
+      <h1>きらりへ💌</h1>
+      <p>ぽちぽちっとログインしてねん</p>
+      <div>
+        <label for="email">めーるあどれしゅ</label><br>
+        <input
+          type="email"
+          id="email">
+      </div>
+      <br>
+      <div>
+        <label for="password">愛のパスワード</label><br>
+        <input
+          type="password"
+          id="password"
+          placeholder="Password">
+      </div>
+      <br>
+      <button id="loginButton">
+        ログイン
+      </button>
+      <p id="message"></p>
+    </div>
+
+    <!-- ログイン後の画面 -->
+     <div id = "content" style = "display: none;">
+      <h1>きらりへ💌</h1>
+      <p>よくログインできました！</p>
+      <br><br><br><br><br><br>
+      <p>ずっと下へいってね</p>
+      <strong>すきです</strong>
+      <br><br>
+
+      <!-- ログアウトボタン -->
+       <button id = "logoutButton">
+        ログアウト
+       </button>
+     </div>
+
+     <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
