@@ -3,15 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>きらりへ💌</title>
+    <title>きらりへ🤍</title>
   </head>
   <body>
     <!-- ログイン画面 -->
     <div id="login-page">
-      <h1>きらりへ💌</h1>
-      <p>ぽちぽちっとログインしてねん</p>
+      <h1>🫶</h1>
       <div>
-        <label for="email">めーるあどれしゅ</label><br>
+        <label for="email">ID</label><br>
         <input
           type="email"
           id="email">
@@ -34,26 +33,53 @@
     <!-- ログイン後の画面 -->
      <div id = "content" style = "display: none;">
       <h1>きらりへ💌</h1>
-      <p>よくログインできました！</p>
-      <br><br><br><br><br><br>
-      <p>ずっと下へいってね</p>
-      <strong>すきです</strong>
-      <hr>
-      <h2>写真を追加</h2>
+      <br><br>
+      <section id="counter-section">
+      <p>💕付き合ってから　 <span id="elapsed-time">0日 0時間 0分 0秒</span>　で、</p>
+      <p>💐 次の記念日まで　<span id="next-anniversary">あと0日</span>　だよん</p>
+      </section>
+      <h2>　[ 幸せステーション🖼️ ]</h2>
+      <div id="photoGallery"></div>
+      <br>
+
+      <!-- メッセージ -->
+      <section id="message-section">
+      <h2>愛するきらりんへ 👚🐰🏊</h2>
+      <!-- 1つ目のメッセージ -->
+      <div id="message-display-1" class="message-display">
+        メッセージ変えないと！
+      </div>
+      <h2>完璧な夫へ 🏎️🏋️‍♂️⚽</h2>
+      <!-- 2つ目のメッセージ -->
+      <div id="message-display-2" class="message-display">
+        きらりの一言ほしいなぁ☺︎
+      </div>
+      <!-- 編集画面 -->
+      <div id="message-edit" style="display: none;">
+        <p>きらりへのメッセージ</p>
+        <textarea id="message-input-1" rows="4"></textarea>
+        <p>一太へのメッセージ</p>
+        <textarea id="message-input-2" rows="4"></textarea>
+        <br>
+        <button id="saveMessageButton">💾 保存</button>
+        <button id="cancelMessageButton">キャンセル</button>
+      </div>
+      <br>
+      <button id="editMessageButton">✏️ コメントを編集</button>
+      </section>
+
+      <br>
+      <p>写真追加して!!!</p>
       <input type="file" id="photoInput" accept="image/*">
-      <br><br>
-      <button id="uploadButton">写真をアップロード</button>
+      <button id="uploadButton">アップロード</button>
       <p id="uploadMessage"></p>
-      <br><br>
-      <h2>お気に入りの写真</h2>
       <button id="deleteModeButton">🗑️ 写真を削除</button>
       <button id="deleteSelectedButton" style="display: none;">選択した写真を削除</button>
-      <div id="photoGallery"></div>
+
 
       <!-- ログアウトボタン -->
-       <button id = "logoutButton">
-        ログアウト
-       </button>
+      <button id = "logoutButton">🔒 ログアウト</button>
+      <br><br><br><br><br>
      </div>
 
      <script type="module" src="./src/main.js"></script>

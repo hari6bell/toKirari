@@ -52,6 +52,7 @@
 
 body {
   margin: 0;
+  font-family: "Yu Gothic", sans-serif;
 }
 
 h1,
@@ -293,4 +294,172 @@ code {
     right: 0;
     border-right-color: var(--border);
   }
+}
+
+#counter-section {
+  text-align: center;
+  padding: 40px 20px;
+  margin-bottom: 40px;
+  font-size: 20px;
+}
+
+#counter-section p {
+  margin: 20px 0;
+}
+
+#elapsed-time,
+#next-anniversary {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+/* ==============================
+   写真の横スクロール
+   ============================== */
+
+#photoGallery {
+  width: 100%;
+  overflow: hidden;
+  margin: 30px 0 50px;
+  position: relative;
+}
+
+/* 写真を横一列に並べる */
+.photo-track {
+  display: flex;
+  width: max-content;
+  gap: 20px;
+  animation: photo-slide 20s linear infinite;
+}
+
+/* 写真1枚分 */
+.photo-container {
+  position: relative;
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+}
+
+/* 写真 */
+.photo-container img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  display: block;
+  box-shadow: var(--shadow);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.25s ease;
+}
+
+/* マウスを乗せたとき */
+.photo-container img:hover {
+  transform: scale(1.05);
+}
+
+/* 選択された写真 */
+.photo-container img.selected {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 5px var(--accent),
+    var(--shadow);
+}
+
+/* 横方向に無限スクロール */
+@keyframes photo-slide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 10px));
+  }
+}
+
+/* 削除用チェックボックス */
+.photo-container input[type="checkbox"] {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+
+  width: 25px;
+  height: 25px;
+
+  cursor: pointer;
+}
+
+h1 {
+  text-align: center;
+}
+
+/* メッセージ全体 */
+#message-section {
+  text-align: center;
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+
+/* 「愛するきらりへ」 */
+#message-section h2 {
+  margin-bottom: 30px;
+}
+
+/* メッセージボックス */
+.message-display {
+  max-width: 600px;
+  min-height: 80px;
+  margin: 20px auto;
+  padding: 25px;
+
+  border: 1px solid #ddd;
+  border-radius: 15px;
+
+  background: rgba(255, 250, 252, 0.8);
+
+  font-size: 20px;
+  line-height: 1.8;
+
+  white-space: pre-wrap;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+/* 真ん中の文章 */
+.message-subtitle {
+  margin: 30px 0;
+  font-size: 18px;
+}
+
+/* 編集画面 */
+#message-edit {
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+/* テキストボックス */
+#message-edit textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* 編集画面の項目 */
+#message-edit p {
+  text-align: left;
+  margin-bottom: 5px;
 }

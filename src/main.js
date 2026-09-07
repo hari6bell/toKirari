@@ -1,5 +1,6 @@
+import './style.css';
 import { login, logout, isLoggedIn, getCurrentUser } from './auth.js';
-import { collection, addDoc, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth, storage, messaging } from './firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL, listAll, deleteObject } from 'firebase/storage';
@@ -17,6 +18,15 @@ const uploadMessage = document.getElementById("uploadMessage"); //アップロ�
 const photoGallery = document.getElementById("photoGallery");   //写真を表示
 const deleteModeButton = document.getElementById("deleteModeButton");
 const deleteSelectedButton = document.getElementById("deleteSelectedButton");
+
+const messageDisplay1 = document.getElementById("message-display-1");
+const messageDisplay2 = document.getElementById("message-display-2");
+const messageEdit = document.getElementById("message-edit");
+const messageInput1 = document.getElementById("message-input-1");
+const messageInput2 = document.getElementById("message-input-2");
+const editMessageButton = document.getElementById("editMessageButton");
+const saveMessageButton = document.getElementById("saveMessageButton");
+const cancelMessageButton = document.getElementById("cancelMessageButton");
 
 let selectedPhotos = new Set();
 let deleteMode = false;
@@ -47,6 +57,10 @@ loginButton.addEventListener("click", async () => {
 
       //メイン画面を表示
       content.style.display = "block";
+      
+      // メッセージを表示
+      loadMessages();
+
     } catch (error) {
       console.error(error);
       alert(error.message);
@@ -81,93 +95,135 @@ onAuthStateChanged(auth, async (user) => {
 
 // Firebase Storageから2人分の写真一覧を取得
 async function loadPhotos() {
-
   try {
-    // 2人のUID
     const userIds = [
       "bjLXVi1seENM1pb5S8G44zBo1Xp1",
       "tPqKbOKHIVgVIpp148eu1Jzzo5y2"
     ];
 
-    // 一度表示をクリア
     photoGallery.innerHTML = "";
+    const photos = [];
 
-    // 2人分のフォルダを順番に取得
+    // ==============================
+    // Firebase Storageから写真取得
+    // ==============================
     for (const userId of userIds) {
 
-      // そのユーザーの写真フォルダ
-      const photosRef = ref(
-        storage,
-        `photos/${userId}`
-      );
-
-      // フォルダ内のファイル一覧を取得
+      const photosRef = ref( storage, `photos/${userId}` );
       const result = await listAll(photosRef);
 
-      // 写真を1枚ずつ表示
       for (const item of result.items) {
-
-        // 写真URLを取得
         const url = await getDownloadURL(item);
-
-        // 写真全体を囲む箱
-        const photoContainer = document.createElement("div");
-        photoContainer.style.display = "inline-block";
-        photoContainer.style.position = "relative";
-        photoContainer.style.margin = "10px";
-
-        // 写真
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = "お気に入りの写真";
-        img.style.width = "200px";
-        img.style.height = "200px";
-        img.style.objectFit = "cover";
-        img.style.margin = "10px";
-
-        // チェックボックス(削除時)
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.style.position = "absolute";
-        checkbox.style.top = "10px";
-        checkbox.style.left = "10px";
-        checkbox.style.width = "25px";
-        checkbox.style.height = "25px";
-        // 削除モードでないときは非表示
-        checkbox.style.display = deleteMode ? "block" : "none";
-
-        // チェック状態が変わったとき
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            selectedPhotos.add(item);
-          } else {
-            selectedPhotos.delete(item);
-          }
+        photos.push({
+          item: item,
+          url: url
         });
-
-        // 写真をクリックしても選択できるようにする
-        img.addEventListener("click", () => {
-          if (!deleteMode) { return; }
-        checkbox.checked = !checkbox.checked;
-        if (checkbox.checked) {
-          selectedPhotos.add(item);
-        } else {
-          selectedPhotos.delete(item);
-        }
-      });
-        // 写真と削除ボタンを追加
-        photoContainer.appendChild(img);
-        photoContainer.appendChild(checkbox);
-
-        // ギャラリーに追加
-        photoGallery.appendChild(photoContainer);
       }
     }
+
+    // 写真がない場合
+    if (photos.length === 0) {
+      photoGallery.innerHTML =
+        "<p>まだ写真がないよ📷</p>";
+      return;
+    }
+
+    // ==============================
+    // 横スクロール
+    // ==============================
+    const track = document.createElement("div");
+    track.className = "photo-track";
+
+    // 同じ写真を2セット並べる
+    const photoList = [...photos, ...photos];
+
+    for (const photo of photoList) {
+      const photoContainer = document.createElement("div");
+      photoContainer.className = "photo-container";
+
+      // ==============================
+      // 写真
+      // ==============================
+      const img = document.createElement("img");
+
+      img.src = photo.url;
+      img.alt = "お気に入りの写真";
+      img.dataset.photoUrl = photo.url;
+
+      // ==============================
+      // 削除用チェックボックス
+      // ==============================
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      checkbox.style.display = deleteMode ? "block" : "none";
+      checkbox.addEventListener( "change", () => {
+          if (checkbox.checked) {
+            selectedPhotos.add(photo.item);
+          } else {
+            selectedPhotos.delete(photo.item);
+          }
+        }
+      );
+
+      // ==============================
+      // 写真クリック
+      // ==============================
+      img.addEventListener( "click", () => {
+          // --------------------------
+          // 削除モード
+          // --------------------------
+          if (deleteMode) { 
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+              selectedPhotos.add( photo.item );
+            } else {
+              selectedPhotos.delete( photo.item );
+            }
+            return;
+          }
+
+          // --------------------------
+          // 通常モード
+          // --------------------------
+          const samePhotos =
+            document.querySelectorAll( `[data-photo-url="${CSS.escape(photo.url)}"]` );
+
+          // すでに選択されているか
+          const isSelected = img.classList.contains( "selected" );
+
+          // いったん全部解除
+          document
+            .querySelectorAll( ".photo-container img" )
+            .forEach( (photoImg) => {
+                photoImg.classList.remove( "selected" );
+              }
+            );
+
+          // まだ選択されていなかった場合
+          // → 同じ写真のコピーも選択
+          if (!isSelected) {
+            samePhotos.forEach( (photoImg) => {
+                photoImg.classList.add( "selected" );
+              }
+            );
+
+            console.log( "選択した写真:", photo.url );
+          }
+        }
+      );
+
+      photoContainer.appendChild(img);
+      photoContainer.appendChild(checkbox);
+      track.appendChild(photoContainer);
+    }
+    photoGallery.appendChild(track);
+
   } catch (error) {
     console.error("写真一覧取得エラー:", error);
   }
 }
-
 // 「削除モード」ボタンを作る
 deleteModeButton.addEventListener("click", async () => {
   deleteMode = !deleteMode;
@@ -321,3 +377,106 @@ async function setupNotifications() {
       console.error("通知登録エラー", error);
   }
 }
+
+// ==============================
+// 付き合ってからの経過時間
+// ==============================
+const startDate = new Date("2025-08-29T00:00:00+09:00");
+function updateCounters() {
+  // 経過時間を計算
+  const now = new Date();
+  const elapsed = now - startDate;
+  const totalSeconds = Math.floor(elapsed / 1000);
+  const days = Math.floor(totalSeconds / (24 * 60 * 60));
+  const hours = Math.floor(
+      (totalSeconds % (24 * 60 * 60)) / (60 * 60)
+  );
+  const minutes = Math.floor(
+      (totalSeconds % (60 * 60)) / 60
+  );
+  const seconds = totalSeconds % 60;
+  document.getElementById("elapsed-time").textContent = `${days}日 ${hours}時間 ${minutes}分 ${seconds}秒`;
+
+  // 次の記念日を計算
+  let nextAnniversary = new Date(now.getFullYear(), now.getMonth(), 29);
+
+    // 今月29日を過ぎていたら来月29日
+    if (now >= nextAnniversary) {
+        nextAnniversary = new Date(now.getFullYear(), now.getMonth() + 1, 29);
+    }
+    const remaining = nextAnniversary - now;
+    const remainingDays = Math.ceil(remaining / (24 * 60 * 60 * 1000));
+    document.getElementById("next-anniversary").textContent = `あと${remainingDays}日`;
+}
+
+// 最初に実行
+updateCounters();
+
+// 1秒ごとに更新
+setInterval(updateCounters, 1000);
+
+
+// =========================
+// メッセージ機能
+// =========================
+// Firestoreからメッセージを読み込む
+async function loadMessages() {
+    try {
+        const messageRef = doc(db, "messages", "main");
+        const snapshot = await getDoc(messageRef);
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            messageDisplay1.textContent = data.message1 || "";
+            messageDisplay2.textContent = data.message2 || "";
+        }
+    } catch (error) {
+        console.error("メッセージ読み込みエラー:", error);
+    }
+}
+
+
+// 編集ボタン
+editMessageButton.addEventListener("click", () => {
+    messageInput1.value = messageDisplay1.textContent;
+    messageInput2.value = messageDisplay2.textContent;
+    messageDisplay1.style.display = "none";
+    messageDisplay2.style.display = "none";
+    messageEdit.style.display = "block";
+    editMessageButton.style.display = "none";
+});
+
+
+// 保存ボタン
+saveMessageButton.addEventListener("click", async () => {
+    const message1 = messageInput1.value;
+    const message2 = messageInput2.value;
+
+    try {
+        await setDoc( doc(db, "messages", "main"),
+            {
+                message1: message1,
+                message2: message2
+            }
+        );
+
+        messageDisplay1.textContent = message1;
+        messageDisplay2.textContent = message2;
+        messageDisplay1.style.display = "block";
+        messageDisplay2.style.display = "block";
+        messageEdit.style.display = "none";
+        editMessageButton.style.display = "inline-block";
+        alert("メッセージを保存しました！");
+    } catch (error) {
+        console.error("メッセージ保存エラー:", error);
+        alert("保存に失敗しました。");
+    }
+});
+
+// キャンセル
+cancelMessageButton.addEventListener("click", () => {
+
+    messageDisplay1.style.display = "block";
+    messageDisplay2.style.display = "block";
+    messageEdit.style.display = "none";
+    editMessageButton.style.display = "inline-block";
+});

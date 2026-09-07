@@ -18,7 +18,7 @@ const messaging = admin.messaging();
 // ==============================
 exports.sendAnniversaryNotification = onSchedule(
     {
-        schedule: "0 8 * * *",
+        schedule: "* * * * *",
         timeZone: "Asia/Tokyo",
     },
     async (event) => {
@@ -62,7 +62,7 @@ exports.sendAnniversaryNotification = onSchedule(
                         notification: {
                             title: "きらりへ 💐",
                             body:
-                                data.message || "今日は記念日。いつもありがとねん",
+                                data.message || "今日は記念日でしゅよん。いつもありがとねん！！！",
                         },
 
                         webpush: {
