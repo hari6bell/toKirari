@@ -12,17 +12,16 @@ admin.initializeApp();
 const db = admin.firestore();
 const messaging = admin.messaging();
 
-
 // ==============================
-// 毎日8時に記念日をチェック
+// 毎日8時に記念日と誕生日をチェック
 // ==============================
 exports.sendAnniversaryNotification = onSchedule(
     {
-        schedule: "* * * * *",
+        schedule: "0 8 * * *",
         timeZone: "Asia/Tokyo",
     },
     async (event) => {
-        console.log("記念日チェック開始");
+        console.log("通知チェック開始");
 
         // 今日の日付
         const now = new Date();
@@ -32,49 +31,84 @@ exports.sendAnniversaryNotification = onSchedule(
 
         console.log("今日の日付：", today);
 
-        // 記念日データを取得
-        const anniversarySnapshot =
-            await db.collection("anniversaries").get();
+        // FCMトークンを取得
+        const tokenSnapshot = await db.collection("users").get();
 
-        // 記念日を確認
-        for (const doc of anniversarySnapshot.docs) {
-            const data = doc.data();
+        // 通知を送信する処理
+        async function checkAndSend(
+            collectionName,
+            notificationTitle,
+            defaultMessage
+        ) {
+            console.log( `${collectionName} を確認します` );
 
-            console.log("確認中：", data);
+            // データ取得
+            const snapshot = await db.collection(collectionName).get();
 
-            // 月日が一致した場合
-            if (data.date === today) {
-                console.log("今日は記念日です！");
+            // データを確認
+            for (const doc of snapshot.docs) {
+                const data = doc.data();
+                console.log( "確認中：", data );
 
-                // FCMトークンを取得
-                const tokenSnapshot = await db.collection("users").get();
+                // 今日の日付と一致するか
+                if (data.date !== today) { continue; }
 
+                console.log( `${collectionName}：今日は通知日です！` );
+
+                // 通知本文
+                const message = data.message || defaultMessage;
+
+                // 全ユーザーへ通知
                 for (const tokenDoc of tokenSnapshot.docs) {
                     const tokenData = tokenDoc.data();
                     const token = tokenData.fcmToken;
 
                     if (!token) { continue; }
 
-                    // 通知を送信
-                    await messaging.send({
-                        token: token,
-
-                        notification: {
-                            title: "きらりへ 💐",
-                            body:
-                                data.message || "今日は記念日でしゅよん。いつもありがとねん！！！",
-                        },
-
-                        webpush: {
-                            fcmOptions: {
-                                link:"https://hari6bell.github.io/toKirari/",
+                    try {
+                        await messaging.send({
+                            token: token,
+                            notification: {
+                                title: notificationTitle,
+                                body: message,
                             },
-                        },
-                    });
-                    console.log("通知送信成功");
+
+                            webpush: {
+                                fcmOptions: {
+                                    link: "https://hari6bell.github.io/toKirari/",
+                                },
+                            },
+                        });
+
+                        console.log( `${collectionName} 通知送信成功` );
+
+                    } catch (error) {
+                        console.error( `${collectionName} 通知送信失敗：`, error );
+                    }
                 }
             }
         }
-        console.log("記念日チェック終了");
+
+        // ① 記念日
+        await checkAndSend(
+            "anniversaries",
+            "💐 きらりへ ",
+            "きょう記念日～✨　いつもありがとねん☺︎"
+        );
+
+        // ② 誕生日
+        await checkAndSend(
+            "birthday",
+            "🎉 きらりへ 🎉",
+            "お誕生日おめでとう～☺︎☺︎☺︎"
+        );
+
+        // ③ 通知テスト
+        await checkAndSend(
+            "notification-test",
+            "🔔 通知テスト",
+            "通知テストです！"
+        );
+        console.log("通知チェック終了");
     }
 );
