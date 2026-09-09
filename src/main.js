@@ -1,4 +1,4 @@
-import '/style.css';
+import './style.css';
 import { login, logout, isLoggedIn, getCurrentUser } from './auth.js';
 import { collection, addDoc, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth, storage, messaging } from './firebase.js';
