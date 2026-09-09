@@ -57,9 +57,6 @@ loginButton.addEventListener("click", async () => {
 
       //メイン画面を表示
       content.style.display = "block";
-      
-      // メッセージを表示
-      loadMessages();
 
     } catch (error) {
       console.error(error);
@@ -86,6 +83,8 @@ onAuthStateChanged(auth, async (user) => {
     content.style.display = "block";
     // 写真を読み込む
     await loadPhotos();
+    // メッセージを読み込む
+    await loadMessages();
   } else {
     console.log("ログインしていません");
     loginPage.style.display = "block";
